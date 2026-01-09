@@ -5,19 +5,15 @@
 #define AGUA 0
 #define NAVIO 3
 
+int main() {
 
-    int main() {  
-        
-    // Matriz que representa o tabuleiro 10x10
     int tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO];
 
-                                                    // Vetores que representam os navios (tamanho fixo 3)
-    int navioHorizontal[TAM_NAVIO] = {NAVIO, NAVIO, NAVIO};
-    int navioVertical[TAM_NAVIO]   = {NAVIO, NAVIO, NAVIO};
-
-                                 // Coordenadas iniciais dos navios (definidas diretamente no código)
-    int linhaH = 2, colunaH = 3; // Navio horizontal
-    int linhaV = 5, colunaV = 6; // Navio vertical
+    // Coordenadas iniciais dos navios
+    int linhaH = 1, colunaH = 2;     // Navio horizontal
+    int linhaV = 5, colunaV = 7;     // Navio vertical
+    int linhaD1 = 0, colunaD1 = 0;   // Navio diagonal principal (\)
+    int linhaD2 = 6, colunaD2 = 9;   // Navio diagonal secundária (/)
 
     int i, j;
     int valido = 1;
@@ -31,57 +27,51 @@
         }
     }
 
-    /* ==========================================
-       Validação do navio horizontal (limites)
-       ========================================== */
-    if (colunaH + TAM_NAVIO > TAM_TABULEIRO) {
-        printf("Erro: Navio horizontal fora dos limites do tabuleiro.\n");
-        valido = 0;
-    }
+    /* ==============================
+       Valida limites dos navios
+       ============================== */
+    if (colunaH + TAM_NAVIO > TAM_TABULEIRO) valido = 0;
+    if (linhaV + TAM_NAVIO > TAM_TABULEIRO) valido = 0;
+    if (linhaD1 + TAM_NAVIO > TAM_TABULEIRO || colunaD1 + TAM_NAVIO > TAM_TABULEIRO) valido = 0;
+    if (linhaD2 + TAM_NAVIO > TAM_TABULEIRO || colunaD2 - (TAM_NAVIO - 1) < 0) valido = 0;
 
-    /* ==========================================
-       Validação do navio vertical (limites)
-       ========================================== */
-    if (linhaV + TAM_NAVIO > TAM_TABULEIRO) {
-        printf("Erro: Navio vertical fora dos limites do tabuleiro.\n");
-        valido = 0;
-    }
-
-    /* ==========================================
-       Verifica sobreposição - navio horizontal
-       ========================================== */
-    for (i = 0; i < TAM_NAVIO && valido; i++) {
-        if (tabuleiro[linhaH][colunaH + i] == NAVIO) {
-            printf("Erro: Sobreposição detectada no navio horizontal.\n");
-            valido = 0;
-        }
-    }
-
-    /* ==========================================
+    /* ==============================
        Posiciona navio horizontal
-       ========================================== */
+       ============================== */
     if (valido) {
         for (i = 0; i < TAM_NAVIO; i++) {
-            tabuleiro[linhaH][colunaH + i] = navioHorizontal[i];
+            if (tabuleiro[linhaH][colunaH + i] != AGUA) valido = 0;
+            tabuleiro[linhaH][colunaH + i] = NAVIO;
         }
     }
 
-    /* ==========================================
-       Verifica sobreposição - navio vertical
-       ========================================== */
-    for (i = 0; i < TAM_NAVIO && valido; i++) {
-        if (tabuleiro[linhaV + i][colunaV] == NAVIO) {
-            printf("Erro: Sobreposição detectada no navio vertical.\n");
-            valido = 0;
-        }
-    }
-
-    /* ==========================================
+    /* ==============================
        Posiciona navio vertical
-       ========================================== */
+       ============================== */
     if (valido) {
         for (i = 0; i < TAM_NAVIO; i++) {
-            tabuleiro[linhaV + i][colunaV] = navioVertical[i];
+            if (tabuleiro[linhaV + i][colunaV] != AGUA) valido = 0;
+            tabuleiro[linhaV + i][colunaV] = NAVIO;
+        }
+    }
+
+    /* ==============================
+       Posiciona navio diagonal (\)
+       ============================== */
+    if (valido) {
+        for (i = 0; i < TAM_NAVIO; i++) {
+            if (tabuleiro[linhaD1 + i][colunaD1 + i] != AGUA) valido = 0;
+            tabuleiro[linhaD1 + i][colunaD1 + i] = NAVIO;
+        }
+    }
+
+    /* ==============================
+       Posiciona navio diagonal (/)
+       ============================== */
+    if (valido) {
+        for (i = 0; i < TAM_NAVIO; i++) {
+            if (tabuleiro[linhaD2 + i][colunaD2 - i] != AGUA) valido = 0;
+            tabuleiro[linhaD2 + i][colunaD2 - i] = NAVIO;
         }
     }
 
@@ -89,7 +79,7 @@
        Exibição do tabuleiro
        ============================== */
     if (valido) {
-        printf("\nTabuleiro Batalha Naval (0 = Agua, 3 = Navio)\n\n");
+        printf("\nTabuleiro Batalha Naval (0 = Agua | 3 = Navio)\n\n");
 
         for (i = 0; i < TAM_TABULEIRO; i++) {
             for (j = 0; j < TAM_TABULEIRO; j++) {
@@ -97,10 +87,13 @@
             }
             printf("\n");
         }
+    } else {
+        printf("\nErro: Navios fora do limite ou sobrepostos.\n");
     }
 
     return 0;
 }
+
 
 
 
